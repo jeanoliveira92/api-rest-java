@@ -7,11 +7,12 @@ import br.com.api.model.Usuario;
 public class DaoUsuario {
 
     // RETORNA TODOS OS FUNCIONARIOS
-    public HashMap listarFuncionarios() throws Exception {
+    public HashMap listarUsuarios() throws Exception {
         String sql = "SELECT * FROM usuarios ORDER BY usuario";
         return DAO.createStatement(sql);
     }
 
+    // ALTERA A SENHA DO USUARIO
     public void trocarSenha(Usuario user) throws Exception {
 
         if (validarFuncionario(user.getUsuario(), user.getSenha()) < 1) {
@@ -23,7 +24,7 @@ public class DaoUsuario {
         ArrayList<String> params = new ArrayList<>();
         params.add(user.getSenha2());
         params.add(user.getUsuario());
-        
+
         DAO.createInsertOrUpdatePrepareStatement(SQL, params);
     }
 
@@ -38,61 +39,24 @@ public class DaoUsuario {
         return DAO.createPrepareStatement(query, params).size() - 1;
     }
 
-    public static String getFuncionarioNome(String usuario) throws Exception {
-        Connection conexao = Config.con();
+    // REALIZA O LOG DE ACESSO
+    public static void setLog(String usuario, String area) throws Exception {
+        String SQL = "INSERT INTO log VALUES(NOW(), ?, ?)";
 
-        Statement statement = conexao.createStatement();
+        ArrayList<String> params = new ArrayList<>();
+        params.add(usuario);
+        params.add(area);
 
-        String query = "SELECT nome FROM usuarios WHERE usuario=" + usuario;
-        ResultSet rs = statement.executeQuery(query);
-        rs.next();
-        String nome = rs.getString(1);
-
-        rs.close();
-        statement.close();
-        conexao.close();
-        return nome;
-    }
-
-    // VALIDA USUARIO E SENHA NO BANCO DE DADOS
-    public static void setLog(String usuario, String tela) throws Exception {
-        int acesso = temAcesso(usuario, tela);
-
-        if (acesso == 1) {
-            Connection conexao = Config.con();
-
-            Statement statement = conexao.createStatement();
-
-            String funcionario = getFuncionarioNome(usuario);
-
-            String SQL = "INSERT INTO log VALUES(sysdate,'" + funcionario + "','" + tela + "')";
-            String query = SQL;
-            System.out.println(SQL);
-            statement.executeUpdate(query);
-
-            statement.close();
-            conexao.close();
-        } else {
-            throw new Exception("Não possui acesso!");
-        }
+        DAO.createInsertOrUpdatePrepareStatement(SQL, params);
     }
 
     // RETORNA O NIVEL DE ACESSO DO USUARIO
-    public static String NivelDeAcesso(String login) throws Exception {
-        Connection conexao = Config.con();
+    public static String NivelDeAcesso(String usuario) throws Exception {
+        String query = "SELECT nivelDeAcesso FROM usuarios WHERE usuario like ?";
+        ArrayList<String> params = new ArrayList<>();
+        params.add('%' + usuario +  '%');
 
-        Statement statement = conexao.createStatement();
-
-        String query = "SELECT permissao FROM usuarios WHERE usuario = '" + login + "'";
-        ResultSet rs = statement.executeQuery(query);
-
-        rs.next();
-        String permissao = rs.getString(1);
-
-        rs.close();
-        statement.close();
-        conexao.close();
-        return permissao;
+        return DAO.createValuePrepareStatement(query, params);
     }
 
     // RETORNA SE TEM PERMISSAO A DETERMINADO ITEM

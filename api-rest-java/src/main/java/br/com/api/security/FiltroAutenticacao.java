@@ -4,16 +4,11 @@ import io.jsonwebtoken.Claims;
 import java.io.IOException;
 import java.security.Principal;
 import javax.annotation.Priority;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.*;
+import javax.ws.rs.container.*;
+import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
 import br.com.api.rest.Login;
-
 
 @Seguro
 // PROVÊ A FUNÇÃO PARA O @SEGURO
@@ -30,13 +25,13 @@ public class FiltroAutenticacao implements ContainerRequestFilter {
         // EXTRAI O TOKEN DO CABEÇALHO
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         System.out.println("token: " + authorizationHeader);
-         
+
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new NotAuthorizedException("Authorization header precisa ser provido");
         }
         //extrai o token do header
         String token = authorizationHeader.substring("Bearer".length()).trim();
-        
+
         //verificamos se o metodo é valido ou não
         //se não for valido  a requisição é abortada e retorna uma resposta com status 401 UNAUTHORIZED
         //se for valida modificamos o o SecurityContext da request 
@@ -48,11 +43,11 @@ public class FiltroAutenticacao implements ContainerRequestFilter {
             if (claims == null) {
                 throw new Exception("Token inválido");
             }
-            
+
             //Metodo que modifica o SecurityContext pra disponibilizar o login do usuario
-            modificarRequestContext(requestContext, claims.getIssuer());  
+            modificarRequestContext(requestContext, claims.getIssuer());
             System.out.println(claims.getIssuer());
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             //Caso o token for invalido a requisição é abortada e retorna uma resposta com status 401 UNAUTHORIZED
@@ -60,13 +55,15 @@ public class FiltroAutenticacao implements ContainerRequestFilter {
                     Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }
-    
+
     //Metodo que modfica o SecurityContext
     private void modificarRequestContext(ContainerRequestContext requestContext, final String login) {
         final SecurityContext currentSecurityContext = requestContext.getSecurityContext();
-        System.out.println("CHEGOU AQUI! " + login);
+
+        System.out.println("Requisitação de: " + login);
+
         requestContext.setSecurityContext(new SecurityContext() {
-            
+
             @Override
             public Principal getUserPrincipal() {
                 return new Principal() {

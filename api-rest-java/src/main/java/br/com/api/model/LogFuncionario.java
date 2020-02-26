@@ -10,7 +10,7 @@ public class LogFuncionario {
         return data;
     }
 
-    public void setDate(String Date) {
+    public void setDate(String data) {
         this.data = data;
     }
 

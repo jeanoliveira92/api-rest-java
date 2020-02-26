@@ -29,7 +29,7 @@ public class Login {
     private final static int MAXTIME = 4;
 
     public Login() throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        // ENCODA A FRASE SERGREDO PRA BASE64
+        // ENCODA A FRASE SERGREDO PRA BASE64 
         MessageDigest md = MessageDigest.getInstance("SHA-512");
         String secret = FRASE_SEGREDO;
         md.update(secret.getBytes("UTF-8"));
@@ -44,11 +44,12 @@ public class Login {
             // TRANSCREVE O JSON PARA CLASSE
             Gson gson = new Gson();
             Usuario user = gson.fromJson(crendenciaisJson, Usuario.class);
-
             // VALIDAÇÃO DO USUARIO E SENHA
             if (DAO.validarFuncionario(user.getUsuario(), user.getSenha()) < 1) {
                 throw new Exception("Usuário ou Senha Inválida!");
             }
+            // LOG
+            DAO.setLog(user.getUsuario(), "LOGIN");
             return Response.ok(gerarToken(user.getUsuario())).build();
         } catch (Exception e) {
             e.printStackTrace(); // DEBUG DE ERROS
@@ -67,7 +68,9 @@ public class Login {
             Usuario user = gson.fromJson(crendenciaisJson, Usuario.class);
             // FUNÇÃO PARA TROCAR A SENHA
             DAO.trocarSenha(user);
-            // RETORNAR STATUS OK
+            // LOG
+            DAO.setLog(user.getUsuario(), "TROCOU A SENHA");
+            // RETORNAR STATUS OK            
             return Response.ok().build();
         } catch (Exception e) {
             e.printStackTrace(); // DEBUG DE ERROS
@@ -75,14 +78,16 @@ public class Login {
             return Response.status(Status.UNAUTHORIZED).build();
         }
     }
-    
-    // RENOVAR UM TOQUEM QUASE VENCENDO    
+
+    // RENOVAR UM TOKEM QUASE VENCENDO    
     @Seguro
     @GET
-    public Response renovarToken(@Context SecurityContext securityContext) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Response renovarToken(@Context SecurityContext securityContext) throws UnsupportedEncodingException, NoSuchAlgorithmException, Exception {
         Principal principal = securityContext.getUserPrincipal();
 
         String token = this.gerarToken(principal.getName());
+
+        DAO.setLog(principal.getName(), "RENOVAÇÃO DO TOKEN");
 
         return Response.ok(token).build();
     }
@@ -129,12 +134,11 @@ public class Login {
     public static NivelDeAcesso buscarNivelPermissao(String login) throws Exception {
         DaoUsuario dao = new DaoUsuario();
 
-        switch (dao.NivelDeAcesso(login)) {
+        /*switch (dao.NivelDeAcesso(login)) {
             case "BASICO": {
                 return NivelDeAcesso.BASICO;
             }
-        }
-
+        }*/
         return NivelDeAcesso.BASICO;
     }
 }
