@@ -1,5 +1,9 @@
 # API REST JAVA
 
+API Rest desenvolvida na linguagem Java. 
+
+Para mais informações sobre Criar uma API em Java, consultar o item 1 da bibliografia, ou se, a duvida for sobre autentiação, vide o item 2.
+
 ## Tecnologias
 * Java
 * Glassfish/Tomcat
@@ -8,6 +12,12 @@
 * JJWT
 * Mysql
 * Oracle
+
+## Dependencias
+Este projeto requer:
+* Java 7 Development Kit (JDK)
+* IDE Netbeans / Eclipse
+* Servidor Glassfish / Tomcat
 
 ## Bibliografia
 [1. Criando um serviço RESTful com Java](https://www.devmedia.com.br/curso/criando-um-servico-restful-com-java/1465)
