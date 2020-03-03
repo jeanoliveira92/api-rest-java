@@ -84,4 +84,4 @@ Funções de conversão: Para que as informações trafeguem rota a fora da API 
 [Tarcisio Carvalho](https://github.com/tarcCar) - Auxilando nas dúvidas quanto a autenticação na API.
 
 ## Licença
-Este projeto está licenciado sob a licença MIT - consulte o arquivo [LICENSE.md] (LICENSE.md) para obter detalhes
+Este projeto está licenciado sob a licença MIT - consulte o arquivo [LICENSE.md] (LICENSE.md) para obter detalhes.
